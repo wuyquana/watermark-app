@@ -7,28 +7,36 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install Python & Java
+    - name: Set up Python 3.11
       uses: actions/setup-python@v5
       with:
-        python-version: "3.11"
-    - run: |
-        sudo apt update
-        sudo apt install -y python3-pip python3-dev build-essential git libssl-dev libffi-dev openjdk-17-jdk unzip wget android-sdk-build-tools
+        python-version: '3.11'
 
-    - name: Install Python dependencies
+    - name: Install dependencies
       run: |
-        pip3 install --upgrade pip
-        pip3 install cython==0.29.36 buildozer
+        sudo apt-get update -y
+        sudo apt-get install -y git zip unzip openjdk-17-jdk
 
-    - name: Build APK
+    - name: Install Buildozer & Cython
+      run: |
+        python -m pip install --upgrade pip
+        pip install cython==0.29.36 buildozer
+
+    # ✅ 这就是官方建议的关键修复步骤
+    - name: Install Android SDK Build Tools
+      run: |
+        yes | sudo sdkmanager --sdk_root=${ANDROID_SDK_ROOT} "platform-tools" "platforms;android-31" "build-tools;33.0.0"
+
+    - name: Build with Buildozer
       run: |
         buildozer android debug
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: watermark-apk
+        name: app-apk
         path: bin/*.apk
