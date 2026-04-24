@@ -18,7 +18,7 @@ jobs:
     - name: Install system packages
       run: |
         sudo apt update
-        sudo apt install -y openjdk-17-jdk git unzip zip
+        sudo apt install -y openjdk-17-jdk git unzip zip autoconf automake libtool
 
     - name: Install cython & buildozer
       run: |
