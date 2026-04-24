@@ -10,13 +10,11 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install Python
+    - name: Install Python & Java
       uses: actions/setup-python@v5
       with:
         python-version: "3.11"
-
-    - name: Install system dependencies
-      run: |
+    - run: |
         sudo apt update
         sudo apt install -y python3-pip python3-dev build-essential git libssl-dev libffi-dev openjdk-17-jdk unzip wget
 
@@ -25,12 +23,22 @@ jobs:
         pip3 install --upgrade pip
         pip3 install cython==0.29.36 buildozer
 
+    - name: Pre-download Android SDK Build Tools
+      run: |
+        mkdir -p ~/.buildozer/android/platform/build-tools/34.0.0
+        wget https://dl.google.com/android/repository/build-tools_r34-linux.zip -O /tmp/build-tools.zip
+        unzip /tmp/build-tools.zip -d ~/.buildozer/android/platform/build-tools/34.0.0
+        # 确保 aidl 可执行
+        chmod +x ~/.buildozer/android/platform/build-tools/34.0.0/android-14/bin/aidl
+
     - name: Build APK
       run: |
+        # 告诉 buildozer 用我们手动下载的构建工具
+        export ANDROID_BUILD_TOOLS_VERSION=34.0.0
         buildozer android debug
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: app-apk
+        name: watermark-apk
         path: bin/*.apk
