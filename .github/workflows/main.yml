@@ -7,31 +7,35 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set up Python 3.11
+    - name: Setup Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.11'
+        python-version: "3.11"
 
-    - name: Install dependencies
+    - name: Install system packages
       run: |
-        sudo apt-get update -y
-        sudo apt-get install -y git zip unzip openjdk-17-jdk
+        sudo apt update
+        sudo apt install -y openjdk-17-jdk git unzip zip
 
-    - name: Install Buildozer & Cython
+    - name: Install cython & buildozer
       run: |
-        python -m pip install --upgrade pip
+        pip install --upgrade pip
         pip install cython==0.29.36 buildozer
 
-    # ✅ 这就是官方建议的关键修复步骤
-    - name: Install Android SDK Build Tools
+    # ✅ 官方AI建议：安装 Android SDK cmdline-tools（解决 sdkmanager not found）
+    - name: Install Android SDK cmdline-tools
       run: |
-        yes | sudo sdkmanager --sdk_root=${ANDROID_SDK_ROOT} "platform-tools" "platforms;android-31" "build-tools;33.0.0"
+        mkdir -p $HOME/sdk/cmdline-tools
+        wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O /tmp/cmdline-tools.zip
+        unzip /tmp/cmdline-tools.zip -d $HOME/sdk/cmdline-tools
+        export ANDROID_SDK_ROOT=$HOME/sdk
+        echo "export ANDROID_SDK_ROOT=$HOME/sdk" >> $GITHUB_ENV
+        yes | $HOME/sdk/cmdline-tools/cmdline-tools/bin/sdkmanager --sdk_root=${ANDROID_SDK_ROOT} "platform-tools" "platforms;android-31" "build-tools;33.0.0"
 
-    - name: Build with Buildozer
+    - name: Build APK
       run: |
         buildozer android debug
 
