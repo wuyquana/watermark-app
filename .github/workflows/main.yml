@@ -15,11 +15,15 @@ jobs:
       with:
         python-version: "3.11"
 
-    - name: Install dependencies
+    - name: Install system dependencies
       run: |
         sudo apt update
-        sudo apt install -y python3-pip
-        pip3 install buildozer
+        sudo apt install -y python3-pip python3-dev build-essential git libssl-dev libffi-dev python3-setuptools
+
+    - name: Install Python dependencies
+      run: |
+        pip3 install --upgrade pip
+        pip3 install cython==0.29.36 buildozer
 
     - name: Build APK
       run: |
@@ -28,5 +32,5 @@ jobs:
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: app-apk
+        name: watermark-apk
         path: bin/*.apk
