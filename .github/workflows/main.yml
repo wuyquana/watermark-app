@@ -43,6 +43,11 @@ jobs:
         mkdir -p $HOME/.buildozer/android/platform/android-sdk
         ln -s $HOME/sdk/build-tools $HOME/.buildozer/android/platform/android-sdk/build-tools
 
+    - name: Fix buildozer Android SDK tools path
+      run: |
+        mkdir -p $HOME/.buildozer/android/platform/android-sdk
+        ln -s $HOME/sdk/cmdline-tools/cmdline-tools $HOME/.buildozer/android/platform/android-sdk/tools
+
     - name: Build APK
       run: |
         buildozer android debug
