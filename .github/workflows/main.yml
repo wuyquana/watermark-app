@@ -35,7 +35,6 @@ jobs:
         # ⚠️ 安装API 31和33，及 build-tools 33.0.0
         yes | $HOME/sdk/cmdline-tools/cmdline-tools/bin/sdkmanager --sdk_root=${ANDROID_SDK_ROOT} "platform-tools" "platforms;android-31" "platforms;android-33" "build-tools;33.0.0"
 
-    # ✅ 官方AI最后一步：设置环境变量 + 软链接
     - name: Set ANDROIDSDK environment variable
       run: echo "ANDROIDSDK=$HOME/sdk" >> $GITHUB_ENV
 
@@ -48,6 +47,12 @@ jobs:
       run: |
         mkdir -p $HOME/.buildozer/android/platform/android-sdk
         ln -s $HOME/sdk/cmdline-tools/cmdline-tools $HOME/.buildozer/android/platform/android-sdk/tools
+
+    # 关键：autoupdate + autoreconf
+    - name: Run autoupdate and autoreconf
+      run: |
+        autoupdate || true
+        autoreconf -ivf || true
 
     - name: Build APK
       run: |
