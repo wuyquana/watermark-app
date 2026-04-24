@@ -18,7 +18,7 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt update
-        sudo apt install -y python3-pip python3-dev build-essential git libssl-dev libffi-dev python3-setuptools
+        sudo apt install -y python3-pip python3-dev build-essential git libssl-dev libffi-dev openjdk-17-jdk unzip wget
 
     - name: Install Python dependencies
       run: |
@@ -32,5 +32,5 @@ jobs:
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: watermark-apk
+        name: app-apk
         path: bin/*.apk
