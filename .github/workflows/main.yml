@@ -32,7 +32,6 @@ jobs:
         unzip /tmp/cmdline-tools.zip -d $HOME/sdk/cmdline-tools
         export ANDROID_SDK_ROOT=$HOME/sdk
         echo "export ANDROID_SDK_ROOT=$HOME/sdk" >> $GITHUB_ENV
-        # ⚠️ 安装API 31和33，及 build-tools 33.0.0
         yes | $HOME/sdk/cmdline-tools/cmdline-tools/bin/sdkmanager --sdk_root=${ANDROID_SDK_ROOT} "platform-tools" "platforms;android-31" "platforms;android-33" "build-tools;33.0.0"
 
     - name: Set ANDROIDSDK environment variable
@@ -48,15 +47,15 @@ jobs:
         mkdir -p $HOME/.buildozer/android/platform/android-sdk
         ln -s $HOME/sdk/cmdline-tools/cmdline-tools $HOME/.buildozer/android/platform/android-sdk/tools
 
-    # 关键：autoupdate + autoreconf
-    - name: Run autoupdate and autoreconf
+    # 关键：加装libtoolize, 否则autoreconf失败
+    - name: Prepare configure script
       run: |
         autoupdate || true
+        libtoolize || true
         autoreconf -ivf || true
 
     - name: Build APK
-      run: |
-        buildozer android debug
+      run: buildozer android debug
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
